@@ -125,7 +125,7 @@ function findmin_paireddistance(dist, dist_thresh)
   return(coords[keep], d[keep])
 end
 
-function findmin_paireddistance(centoirds1::Vector{Centroid}, centroids2::Vector{Centroid}, dist_thresh::Number)
+function findmin_paireddistance(centroids1::Vector{Centroid}, centroids2::Vector{Centroid}, dist_thresh::Number)
   dist = find_dist(centroids1, centroids2)
   d1, p1 = vec.(findmin(dist, dims = 2))
   d2, p2 = vec.(findmin(dist, dims = 1))
