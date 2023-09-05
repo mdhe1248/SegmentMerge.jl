@@ -48,6 +48,14 @@ function find_centroid(segimg, lbls::Vector)
   return(output)
 end
 
+function find_centroid_test(segimg, lbls::Vector)
+  output = Vector{Centroid}(undef,length(lbls))
+  Threads.@threads for i in axes(lbls, 1)
+    output[i] = find_centroid(segimg, lbls[i])
+  end
+  return(output)
+end
+
 function find_centroid(img, segimg, lbl)
   lblimg = copy(img)
   coords = findall(segimg .== lbl)
