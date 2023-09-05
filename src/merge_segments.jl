@@ -39,16 +39,16 @@ function find_centroid(segimg, lbl)
   centroid_yi = round(Int, yi/length(coords))
   return(Centroid(lbl, (centroid_xi, centroid_yi)))
 end
-
+#
+#function find_centroid(segimg, lbls::Vector)
+#  output = Vector{Centroid}(undef,length(lbls))
+#  for (i, lbl) in enumerate(lbls)
+#    output[i] = find_centroid(segimg, lbl)
+#  end
+#  return(output)
+#end
+#
 function find_centroid(segimg, lbls::Vector)
-  output = Vector{Centroid}(undef,length(lbls))
-  for (i, lbl) in enumerate(lbls)
-    output[i] = find_centroid(segimg, lbl)
-  end
-  return(output)
-end
-
-function find_centroid_test(segimg, lbls::Vector)
   output = Vector{Centroid}(undef,length(lbls))
   Threads.@threads for i in axes(lbls, 1)
     output[i] = find_centroid(segimg, lbls[i])
@@ -79,10 +79,11 @@ end
 
 """
 `thresh` is either true or specific value for thresholding before mean calculation.
+`thresh = 0` for no threshold
 """
 function get_amplitude(img2d, segimg, lbl; thresh = true)
   pxinten = img2d[segimg .== lbl]
-  if thresh 
+  if thresh == true
     thresh = mean(pxinten)
   end
   amp = mean(pxinten[pxinten .> thresh])
@@ -90,8 +91,9 @@ function get_amplitude(img2d, segimg, lbl; thresh = true)
 end
 function get_amplitude(img2d, segimg, lbls::Vector; thresh = true)   
   output = Vector{Tuple{Int, Float64}}(undef, length(lbls))
-  for (i, lbl) in enumerate(lbls)
-    output[i] = (lbl, get_amplitude(img2d, segimg, lbl; thresh = thresh))
+  Threads.@threads for i in axes(lbls, 1)
+#  for (i, lbl) in enumerate(lbls)
+    output[i] = (lbls[i], get_amplitude(img2d, segimg, lbls[i]; thresh = thresh))
   end
   return(output)
 end
